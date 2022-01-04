@@ -15,7 +15,7 @@ func (s *Server) router() {
 		// put object
 		r.Post("/put_object", MiddlewareAuth(s.ApiPutObject))
 		// get object
-		r.Post("/get_object", MiddlewareAuth(s.ApiGetObject))
+		r.Get("/get_object", MiddlewareAuth(s.ApiGetObject))
 		// del object
 		r.Post("/del_object", MiddlewareAuth(s.ApiDelete))
 		// remove bucket
