@@ -20,10 +20,19 @@ func GetLoggerConfig() cfg.LoggerConfig {
 	}
 }
 
+func GetStoragePath() string {
+	logPath := os.Getenv("StoragePath")
+	if logPath == "" {
+		logPath = "/data/"
+	}
+
+	return logPath
+}
+
 func GetCORSAllowedOrigins() []string {
 	cors := os.Getenv("CORSAllowedOrigins")
 	if cors == "" {
-		return nil
+		return []string{"https://*", "http://*"}
 	}
 
 	return strings.Split(cors, ",")

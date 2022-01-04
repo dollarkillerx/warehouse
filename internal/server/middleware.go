@@ -1,4 +1,4 @@
-package utils
+package server
 
 import (
 	"github.com/dollarkillerx/warehouse/internal/config"
@@ -7,7 +7,7 @@ import (
 )
 
 // MiddlewareAuth 校验用户是否合法
-func MiddlewareAuth(next http.Handler) http.Handler {
+func MiddlewareAuth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessKey := r.Header.Get("AccessKey")
 		secretKey := r.Header.Get("SecretKey")
