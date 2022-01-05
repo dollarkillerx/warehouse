@@ -5,6 +5,7 @@ import (
 	"github.com/dollarkillerx/warehouse/pkg/models"
 	"github.com/dollarkillerx/warehouse/pkg/utils"
 	"github.com/vmihailenco/msgpack/v5"
+
 	"io/ioutil"
 	"net/http"
 	"os"

@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  rough_stone:
+    image: dollarkiller/warehouse:latest
+    volumes:
+      - ./data/:/data/
+      - ./log/:/log/
+    restart: on-failure
+    environment:
+      ListenAddr: 0.0.0.0:8187
+      AccessKey: access_key
+      SecretKey: secret_key
+    network_mode: bridge
+    ports:
+      - 8187:8187

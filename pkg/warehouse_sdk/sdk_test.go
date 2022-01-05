@@ -9,7 +9,7 @@ import (
 var img = "1EF47AB1E252EFF71AF37D8761B58F8E.jpg"
 
 func TestSdk(t *testing.T) {
-	sdk := New("http://127.0.0.1:8187", "123", "345", 0)
+	sdk := New("http://127.0.0.1:8187", "access_key", "secret_key", 0)
 	err := sdk.Ping()
 	if err != nil {
 		panic(err)
@@ -37,8 +37,8 @@ func TestSdk(t *testing.T) {
 	//	panic(err)
 	//}
 
-	err = sdk.RemoveBucket("img")
-	if err != nil {
-		panic(err)
-	}
+	//err = sdk.RemoveBucket("img")
+	//if err != nil {
+	//	panic(err)
+	//}
 }
