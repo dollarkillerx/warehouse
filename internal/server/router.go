@@ -19,7 +19,7 @@ func (s *Server) router() {
 		// del object
 		r.Post("/del_object", MiddlewareAuth(s.ApiDelete))
 		// remove bucket
-		r.Post("/remove_object", MiddlewareAuth(s.ApiRemoveBucket))
+		r.Post("/remove_bucket", MiddlewareAuth(s.ApiRemoveBucket))
 		// download
 		r.Get("/download", s.Download)
 	})

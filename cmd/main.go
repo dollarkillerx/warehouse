@@ -12,6 +12,8 @@ import (
 func main() {
 	utils.InitLogger(config.GetLoggerConfig())
 
+	log.SetFlags(log.LstdFlags | log.Llongfile)
+
 	s := server.New()
 	fmt.Println("run: ", config.GetListenAddr())
 	if err := s.Run(); err != nil {

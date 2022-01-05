@@ -12,6 +12,6 @@ type MetaData struct {
 }
 
 type Object struct {
-	MetaData
-	Data []byte `json:"data"`
+	MetaData MetaData `json:"meta_data"`
+	Data     []byte   `json:"data"`
 }

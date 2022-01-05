@@ -5,7 +5,6 @@ import (
 	"github.com/dollarkillerx/warehouse/pkg/models"
 	"github.com/dollarkillerx/warehouse/pkg/utils"
 	"github.com/vmihailenco/msgpack/v5"
-
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -21,7 +20,7 @@ func (s *Server) ApiPutObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if obj.BucketName == "" {
+	if obj.MetaData.BucketName == "" {
 		http.Error(w, http.StatusText(400), 400)
 		return
 	}
@@ -33,8 +32,8 @@ func (s *Server) ApiPutObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metaDataPath := path.Join(config.GetStoragePath(), obj.BucketName, "metadata", obj.ObjectName)
-	dataPath := path.Join(config.GetStoragePath(), obj.BucketName, "data", obj.ObjectName)
+	metaDataPath := path.Join(config.GetStoragePath(), obj.MetaData.BucketName, "metadata", obj.MetaData.ObjectName)
+	dataPath := path.Join(config.GetStoragePath(), obj.MetaData.BucketName, "data", obj.MetaData.ObjectName)
 
 	err = utils.MakeDir(metaDataPath)
 	if err != nil {
@@ -182,7 +181,7 @@ func (s *Server) ApiRemoveBucket(w http.ResponseWriter, r *http.Request) {
 
 	bucketPath := path.Join(config.GetStoragePath(), bucket)
 
-	os.Remove(bucketPath)
+	os.RemoveAll(bucketPath)
 
 	utils.String(w, 200, "success")
 }

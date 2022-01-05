@@ -16,18 +16,27 @@ type WareHouseSdk struct {
 	addr      string
 	accessKey string
 	secretKey string
+	timeout   time.Duration
 }
 
-func New(addr string, accessKey string, secretKey string) *WareHouseSdk {
+func New(addr string, accessKey string, secretKey string, timeout time.Duration) *WareHouseSdk {
+	if timeout < time.Second {
+		timeout = time.Second * 10
+	}
 	return &WareHouseSdk{
 		addr:      addr,
 		accessKey: accessKey,
 		secretKey: secretKey,
+		timeout:   timeout,
 	}
 }
 
+func (w *WareHouseSdk) auth(r *urllib.Urllib) *urllib.Urllib {
+	return r.SetHeader("AccessKey", w.accessKey).SetHeader("SecretKey", w.secretKey).SetTimeout(w.timeout)
+}
+
 func (w *WareHouseSdk) Ping() error {
-	code, rp, err := urllib.Post(fmt.Sprintf("%s/v1/auth", w.addr)).ByteOriginal()
+	code, rp, err := w.auth(urllib.Post(fmt.Sprintf("%s/v1/auth", w.addr))).ByteOriginal()
 	if err != nil {
 		return err
 	}
@@ -67,6 +76,7 @@ func (w *WareHouseSdk) PutObject(bucketName, objectName string, data []byte, met
 			MetaData:      mt,
 			Expires:       expires,
 		},
+		Data: data,
 	}
 
 	marshal, err := msgpack.Marshal(obj)
@@ -74,7 +84,7 @@ func (w *WareHouseSdk) PutObject(bucketName, objectName string, data []byte, met
 		return err
 	}
 
-	code, rp, err := urllib.Post(fmt.Sprintf("%s/v1/put_object", w.addr)).SetBody(marshal).ByteOriginal()
+	code, rp, err := w.auth(urllib.Post(fmt.Sprintf("%s/v1/put_object", w.addr))).SetBody(marshal).ByteOriginal()
 	if err != nil {
 		return err
 	}
@@ -86,8 +96,27 @@ func (w *WareHouseSdk) PutObject(bucketName, objectName string, data []byte, met
 	return nil
 }
 
-func (w *WareHouseSdk) GetObject(bucketName, objectName string) (models.Object, error) {
-	code, rp, err := urllib.Get(fmt.Sprintf("%s/v1/get_object", w.addr)).Queries("").ByteOriginal()
+func (w *WareHouseSdk) GetObject(bucket, objectName string) (*models.Object, error) {
+	var obj models.Object
+	code, rp, err := w.auth(urllib.Get(fmt.Sprintf("%s/v1/get_object", w.addr))).Queries("file", objectName).Queries("bucket", bucket).ByteOriginal()
+	if err != nil {
+		return nil, err
+	}
+
+	if code != 200 {
+		return nil, errors.New(string(rp))
+	}
+
+	err = msgpack.Unmarshal(rp, &obj)
+	if err != nil {
+		return nil, err
+	}
+
+	return &obj, nil
+}
+
+func (w *WareHouseSdk) DelObject(bucket, objectName string) error {
+	code, rp, err := w.auth(urllib.Post(fmt.Sprintf("%s/v1/del_object", w.addr))).Queries("file", objectName).Queries("bucket", bucket).ByteOriginal()
 	if err != nil {
 		return err
 	}
@@ -95,7 +124,18 @@ func (w *WareHouseSdk) GetObject(bucketName, objectName string) (models.Object, 
 	if code != 200 {
 		return errors.New(string(rp))
 	}
+	return nil
+}
 
+func (w *WareHouseSdk) RemoveBucket(bucket string) error {
+	code, rp, err := w.auth(urllib.Post(fmt.Sprintf("%s/v1/remove_bucket", w.addr))).Queries("bucket", bucket).ByteOriginal()
+	if err != nil {
+		return err
+	}
+
+	if code != 200 {
+		return errors.New(string(rp))
+	}
 	return nil
 }
 

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -42,11 +43,13 @@ func FromMsgPack(r *http.Request, b interface{}) error {
 	if r.Body != nil {
 		defer r.Body.Close()
 	}
+
 	all, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
 
+	fmt.Println(len(all))
 	err = msgpack.Unmarshal(all, b)
 	if err != nil {
 		return err
